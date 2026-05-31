@@ -1,0 +1,2460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="LevelUp Home">
+<meta name="theme-color" content="#1d1342">
+<title>LevelUp Home</title>
+<style>
+/* ===================== GLOBAL RESET & BASE ===================== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  height: 100%; width: 100%;
+  overflow: hidden;
+  font-family: 'Georgia', serif;
+  background: #0a0a0f;
+  color: #f0ece8;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* ===================== CSS VARIABLES ===================== */
+:root {
+  /* Aditi – TS palette */
+  --aditi-bg: #1d1342;
+  --aditi-accent: #c9a84c;
+  --aditi-rose: #d4a0b0;
+  --aditi-text: #f0ece8;
+  --aditi-dim: rgba(240,236,232,0.55);
+  --aditi-card: rgba(255,255,255,0.06);
+  --aditi-must: #c9a84c;
+  --aditi-regular: #9b89b4;
+
+  /* Narain – Naruto/BTS palette */
+  --narain-bg: #080c14;
+  --narain-bg2: #0d1220;
+  --narain-accent: #c9921a;      /* gold */
+  --narain-red: #c0392b;         /* Naruto orange-red */
+  --narain-blue: #1a3a6b;        /* deep cobalt */
+  --narain-blue-light: #2e6db4;
+  --narain-text: #e8e0d0;
+  --narain-dim: rgba(232,224,208,0.55);
+  --narain-card: rgba(26,58,107,0.25);
+  --narain-must: #c9921a;
+  --narain-regular: #2e6db4;
+  --narain-scroll: rgba(196,157,80,0.12);
+  --narain-border: rgba(201,146,26,0.3);
+}
+
+/* ===================== SCREENS ===================== */
+.screen {
+  position: fixed;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+.screen.active { display: flex; }
+
+/* ===================== SPLASH ===================== */
+#screen-splash {
+  background: radial-gradient(ellipse at 30% 40%, #2a1a5e 0%, #1d1342 40%, #0a0810 100%);
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 28px;
+  padding: 40px 24px;
+}
+.splash-title {
+  font-size: 13px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: rgba(201,168,76,0.7);
+  font-family: 'Georgia', serif;
+  font-style: italic;
+}
+.splash-wordmark {
+  font-size: clamp(38px, 9vw, 56px);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  color: #f0ece8;
+  line-height: 1.1;
+}
+.splash-wordmark em {
+  font-style: italic;
+  color: #c9a84c;
+}
+.splash-sub {
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: rgba(240,236,232,0.45);
+  font-style: italic;
+}
+.splash-status {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: rgba(240,236,232,0.3);
+  margin-top: 8px;
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:0.3} 50%{opacity:0.7} }
+
+/* ===================== HOME ===================== */
+#screen-home {
+  background: radial-gradient(ellipse at 50% 20%, #251848 0%, #1d1342 50%, #0f0c22 100%);
+  padding: 60px 24px 40px;
+  gap: 0;
+}
+.home-header {
+  text-align: center;
+  margin-bottom: 48px;
+  padding-top: 20px;
+}
+.home-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: rgba(201,168,76,0.6);
+  margin-bottom: 10px;
+}
+.home-wordmark {
+  font-size: clamp(30px, 8vw, 46px);
+  font-weight: 300;
+  letter-spacing: -0.01em;
+  color: #f0ece8;
+  line-height: 1.15;
+}
+.home-wordmark em { font-style: italic; color: #c9a84c; }
+.home-tagline {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: rgba(240,236,232,0.35);
+  font-style: italic;
+  margin-top: 8px;
+}
+
+.profiles-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  width: 100%;
+  max-width: 360px;
+}
+.profile-card {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  padding: 24px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+.profile-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(201,168,76,0.08) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.profile-card:active::before, .profile-card:hover::before { opacity: 1; }
+.profile-card:active { transform: scale(0.97); }
+.profile-avatar { font-size: 36px; margin-bottom: 10px; }
+.profile-name {
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: #f0ece8;
+  font-style: italic;
+}
+.profile-sub {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: rgba(240,236,232,0.4);
+  margin-top: 4px;
+  text-transform: uppercase;
+}
+
+/* ===================== PIN SCREEN ===================== */
+#screen-pin {
+  justify-content: center;
+  align-items: center;
+  padding: 40px 24px;
+  gap: 32px;
+}
+#screen-pin.aditi-bg { background: radial-gradient(ellipse at 40% 30%, #2a1a5e, #1d1342 60%, #0a0810); }
+#screen-pin.narain-bg { background: radial-gradient(ellipse at 40% 30%, #0d1a30, #080c14 60%, #000408); }
+#screen-pin.mama-bg { background: radial-gradient(ellipse at 40% 30%, #2d1f30, #1a1220 60%, #0a0810); }
+#screen-pin.papa-bg { background: radial-gradient(ellipse at 40% 30%, #101820, #0a1015 60%, #000408); }
+
+.pin-avatar { font-size: 52px; text-align: center; }
+.pin-title {
+  text-align: center;
+  font-size: 22px;
+  font-weight: 300;
+  font-style: italic;
+  color: #f0ece8;
+  letter-spacing: 0.05em;
+}
+.pin-sub {
+  text-align: center;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: rgba(240,236,232,0.4);
+  font-style: italic;
+}
+.pin-dots {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+}
+.pin-dot {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(240,236,232,0.4);
+  background: transparent;
+  transition: all 0.2s ease;
+}
+.pin-dot.filled { background: #c9a84c; border-color: #c9a84c; }
+.pin-error {
+  text-align: center;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: rgba(220,100,100,0.8);
+  font-style: italic;
+  min-height: 16px;
+}
+.pin-keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  width: 100%;
+  max-width: 280px;
+}
+.pin-key {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  font-size: 20px;
+  font-family: 'Georgia', serif;
+  color: #f0ece8;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.pin-key:active { transform: scale(0.93); background: rgba(201,168,76,0.18); }
+.pin-key.del { font-size: 15px; letter-spacing: 0.05em; color: rgba(240,236,232,0.6); }
+.pin-back {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: rgba(240,236,232,0.4);
+  cursor: pointer;
+  text-transform: uppercase;
+  padding: 8px;
+  margin-top: -8px;
+}
+
+/* ===================== ADITI PROFILE ===================== */
+#screen-aditi {
+  background: radial-gradient(ellipse at 30% 0%, #2a1a5e 0%, #1d1342 45%, #0f0c22 100%);
+  min-height: 100%;
+  padding-bottom: 100px;
+}
+
+/* ===================== NARAIN PROFILE ===================== */
+#screen-narain {
+  background: #080c14;
+  min-height: 100%;
+  padding-bottom: 100px;
+  position: relative;
+}
+#screen-narain::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 15% 10%, rgba(192,57,43,0.12) 0%, transparent 45%),
+    radial-gradient(ellipse at 85% 5%, rgba(26,58,107,0.25) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(201,146,26,0.06) 0%, transparent 40%);
+  pointer-events: none;
+  z-index: 0;
+}
+#screen-narain > * { position: relative; z-index: 1; }
+
+/* ===================== MAMA / PAPA PLACEHOLDER ===================== */
+#screen-mama, #screen-papa {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 20px;
+  padding: 40px 24px;
+}
+#screen-mama { background: radial-gradient(ellipse at 40% 30%, #2d1f30, #1a1220 60%, #0a0810); }
+#screen-papa { background: radial-gradient(ellipse at 40% 30%, #101820, #0a1015 60%, #000408); }
+.placeholder-avatar { font-size: 56px; }
+.placeholder-title {
+  font-size: 22px;
+  font-weight: 300;
+  font-style: italic;
+  color: #f0ece8;
+  letter-spacing: 0.05em;
+}
+.placeholder-sub {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: rgba(240,236,232,0.4);
+  font-style: italic;
+  line-height: 1.7;
+  max-width: 280px;
+}
+.placeholder-next {
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  color: rgba(201,168,76,0.5);
+  text-transform: uppercase;
+  margin-top: 8px;
+}
+.btn-back {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: rgba(240,236,232,0.45);
+  cursor: pointer;
+  padding: 12px 20px;
+  text-transform: uppercase;
+  margin-top: 16px;
+}
+
+/* ===================== SHARED PROFILE COMPONENTS ===================== */
+.profile-header {
+  padding: 52px 24px 24px;
+  text-align: center;
+}
+.profile-header-avatar { font-size: 44px; margin-bottom: 12px; }
+.profile-header-name {
+  font-size: 26px;
+  font-weight: 300;
+  font-style: italic;
+  letter-spacing: 0.04em;
+}
+.profile-header-dash {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  opacity: 0.5;
+  margin: 6px 0;
+}
+.profile-header-era {
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.section-label {
+  font-size: 10px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  opacity: 0.45;
+  text-align: center;
+  padding: 0 24px;
+  margin: 28px 0 12px;
+}
+
+/* Progress bar */
+.era-progress-wrap {
+  margin: 0 24px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 4px;
+  height: 4px;
+  overflow: hidden;
+}
+.era-progress-bar {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.6s ease;
+}
+.aditi-progress { background: linear-gradient(90deg, #c9a84c, #e8c97a); }
+.narain-progress { background: linear-gradient(90deg, #c9921a, #f0b832); }
+
+.era-progress-label {
+  text-align: center;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  margin-top: 8px;
+  opacity: 0.5;
+  font-style: italic;
+  padding: 0 24px;
+}
+
+/* Stat cards row */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 0 24px;
+  margin: 16px 0;
+}
+.stat-card {
+  border-radius: 12px;
+  padding: 14px 8px;
+  text-align: center;
+}
+.stat-number {
+  font-size: 22px;
+  font-weight: 300;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.stat-label {
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+.stat-sub {
+  font-size: 10px;
+  opacity: 0.6;
+  margin-top: 2px;
+  font-style: italic;
+}
+
+/* Aditi stat cards */
+.aditi-stat { background: rgba(255,255,255,0.05); border: 1px solid rgba(201,168,76,0.15); }
+.aditi-stat .stat-number { color: #c9a84c; }
+
+/* Narain stat cards */
+.narain-stat { background: rgba(26,58,107,0.2); border: 1px solid rgba(201,146,26,0.2); }
+.narain-stat .stat-number { color: #c9921a; }
+
+/* Boss challenge */
+.boss-section {
+  margin: 8px 24px;
+  border-radius: 14px;
+  padding: 18px 16px;
+  text-align: center;
+}
+.aditi-boss { background: rgba(201,168,76,0.06); border: 1px solid rgba(201,168,76,0.15); }
+.narain-boss {
+  background: rgba(192,57,43,0.08);
+  border: 1px solid rgba(192,57,43,0.25);
+  position: relative;
+  overflow: hidden;
+}
+.narain-boss::before {
+  content: '🐉';
+  position: absolute;
+  right: -8px; top: -8px;
+  font-size: 48px;
+  opacity: 0.08;
+}
+.boss-eyebrow {
+  font-size: 9px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  opacity: 0.5;
+  margin-bottom: 6px;
+}
+.boss-title {
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  opacity: 0.8;
+  font-style: italic;
+}
+.boss-body {
+  font-size: 11px;
+  opacity: 0.5;
+  margin-top: 6px;
+  line-height: 1.6;
+  font-style: italic;
+}
+
+/* Task list */
+.tasks-container { padding: 0 24px; }
+.task-card {
+  border-radius: 12px;
+  margin-bottom: 10px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+.task-card:active { transform: scale(0.98); }
+
+/* Aditi task */
+.aditi-task { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); }
+.aditi-task.must { border-left: 3px solid var(--aditi-must); }
+.aditi-task.regular { border-left: 3px solid var(--aditi-regular); }
+.aditi-task.done { opacity: 0.5; }
+.aditi-task.done .task-name { text-decoration: line-through; }
+
+/* Narain task – scroll aesthetic */
+.narain-task {
+  background: var(--narain-scroll);
+  border: 1px solid var(--narain-border);
+  border-radius: 8px;
+}
+.narain-task::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  border-radius: 8px 0 0 8px;
+}
+.narain-task.must::before { background: var(--narain-accent); }
+.narain-task.regular::before { background: var(--narain-blue-light); }
+.narain-task.done { opacity: 0.45; }
+.narain-task.done .task-name { text-decoration: line-through; }
+
+.task-check {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.25);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 11px;
+  transition: all 0.2s;
+}
+.task-check.checked { border-color: transparent; }
+.aditi-task .task-check.checked { background: #c9a84c; color: #1d1342; }
+.narain-task .task-check.checked { background: var(--narain-accent); color: #080c14; }
+
+.task-info { flex: 1; }
+.task-name {
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+}
+.task-narain-name {
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  color: var(--narain-text);
+  line-height: 1.3;
+}
+.task-jutsu {
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--narain-accent);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+  opacity: 0.7;
+}
+.task-meta {
+  font-size: 10px;
+  opacity: 0.5;
+  margin-top: 2px;
+}
+.task-pts {
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  opacity: 0.6;
+  flex-shrink: 0;
+  font-style: italic;
+}
+
+/* Task header with count */
+.task-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  margin: 20px 0 10px;
+}
+.task-section-title {
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  opacity: 0.5;
+}
+.task-count-badge {
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  opacity: 0.7;
+  letter-spacing: 0.05em;
+}
+.aditi-badge { background: rgba(201,168,76,0.15); color: #c9a84c; }
+.narain-badge { background: rgba(201,146,26,0.15); color: var(--narain-accent); }
+
+/* Curtain call button */
+.curtain-btn {
+  margin: 24px 24px 0;
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid;
+}
+.curtain-btn:active { transform: scale(0.97); }
+.aditi-curtain {
+  background: rgba(201,168,76,0.08);
+  border-color: rgba(201,168,76,0.3);
+}
+.narain-curtain {
+  background: rgba(201,146,26,0.08);
+  border-color: rgba(201,146,26,0.3);
+}
+.curtain-title {
+  font-size: 14px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-style: italic;
+}
+.curtain-sub {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  opacity: 0.5;
+  margin-top: 4px;
+  font-style: italic;
+}
+
+/* Shop section */
+.shop-section { padding: 0 24px; }
+.shop-header {
+  text-align: center;
+  margin-bottom: 16px;
+}
+.shop-title {
+  font-size: 16px;
+  letter-spacing: 0.15em;
+  font-style: italic;
+}
+.shop-sub {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  opacity: 0.45;
+  margin-top: 4px;
+  font-style: italic;
+}
+.reward-card {
+  border-radius: 12px;
+  margin-bottom: 10px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.reward-card:active { transform: scale(0.98); }
+.aditi-reward { background: rgba(255,255,255,0.05); border: 1px solid rgba(201,168,76,0.15); }
+.narain-reward { background: rgba(26,58,107,0.2); border: 1px solid rgba(201,146,26,0.15); }
+.reward-stars {
+  font-size: 16px;
+  font-weight: 300;
+  min-width: 44px;
+  text-align: center;
+}
+.aditi-reward .reward-stars { color: #c9a84c; }
+.narain-reward .reward-stars { color: var(--narain-accent); }
+.reward-stars-label {
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  opacity: 0.5;
+  text-transform: uppercase;
+  margin-top: 1px;
+}
+.reward-info { flex: 1; }
+.reward-name { font-size: 13px; letter-spacing: 0.03em; }
+.reward-narain-name { font-size: 13px; letter-spacing: 0.03em; color: var(--narain-text); }
+.reward-detail { font-size: 10px; opacity: 0.5; margin-top: 2px; font-style: italic; }
+.reward-arrow { opacity: 0.35; font-size: 14px; }
+.custom-reward-btn {
+  border-radius: 10px;
+  padding: 14px 16px;
+  text-align: center;
+  cursor: pointer;
+  margin-top: 6px;
+  border: 1px dashed;
+  transition: all 0.2s;
+}
+.custom-reward-btn:active { transform: scale(0.97); }
+.aditi-custom { border-color: rgba(201,168,76,0.3); background: rgba(201,168,76,0.04); }
+.narain-custom { border-color: rgba(201,146,26,0.25); background: rgba(201,146,26,0.04); }
+.custom-reward-text {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  opacity: 0.6;
+  font-style: italic;
+}
+
+/* Journal section */
+.journal-section { padding: 0 24px; }
+.journal-header { text-align: center; margin-bottom: 8px; }
+.journal-title {
+  font-size: 16px;
+  letter-spacing: 0.15em;
+  font-style: italic;
+}
+.journal-sub {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  opacity: 0.45;
+  margin-top: 4px;
+}
+.journal-quote {
+  border-radius: 12px;
+  padding: 18px 16px;
+  margin-bottom: 14px;
+  border-left: 2px solid;
+}
+.aditi-journal-quote {
+  background: rgba(201,168,76,0.06);
+  border-color: rgba(201,168,76,0.3);
+}
+.narain-journal-quote {
+  background: rgba(26,58,107,0.2);
+  border-color: rgba(201,146,26,0.35);
+}
+.journal-quote-text {
+  font-size: 12px;
+  line-height: 1.8;
+  font-style: italic;
+  opacity: 0.75;
+}
+.journal-quote-attr {
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.4;
+  margin-top: 10px;
+}
+.journal-entries { margin-top: 12px; }
+.journal-entry-item {
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+}
+.aditi-entry { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); }
+.narain-entry { background: rgba(26,58,107,0.15); border: 1px solid rgba(201,146,26,0.12); }
+.entry-date { font-size: 9px; letter-spacing: 0.15em; opacity: 0.4; text-transform: uppercase; }
+.entry-text { font-size: 12px; opacity: 0.7; margin-top: 4px; line-height: 1.6; font-style: italic; }
+.journal-new-btn {
+  border-radius: 10px;
+  padding: 14px 16px;
+  text-align: center;
+  cursor: pointer;
+  margin-top: 10px;
+  border: 1px dashed;
+  transition: all 0.2s;
+}
+.journal-new-btn:active { transform: scale(0.97); }
+.aditi-new-btn { border-color: rgba(201,168,76,0.3); background: rgba(201,168,76,0.04); }
+.narain-new-btn { border-color: rgba(201,146,26,0.25); background: rgba(201,146,26,0.04); }
+.journal-new-text {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  opacity: 0.6;
+  font-style: italic;
+}
+
+/* Eras section */
+.eras-section { padding: 0 24px; }
+.eras-header { text-align: center; margin-bottom: 16px; }
+.eras-title {
+  font-size: 16px;
+  letter-spacing: 0.15em;
+  font-style: italic;
+}
+.eras-sub {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  opacity: 0.45;
+  margin-top: 4px;
+}
+.eras-alltime-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.era-alltime-card {
+  border-radius: 10px;
+  padding: 14px 10px;
+  text-align: center;
+}
+.aditi-alltime { background: rgba(255,255,255,0.04); border: 1px solid rgba(201,168,76,0.12); }
+.narain-alltime { background: rgba(26,58,107,0.15); border: 1px solid rgba(201,146,26,0.12); }
+.alltime-number {
+  font-size: 24px;
+  font-weight: 300;
+  letter-spacing: -0.01em;
+}
+.aditi-alltime .alltime-number { color: #c9a84c; }
+.narain-alltime .alltime-number { color: var(--narain-accent); }
+.alltime-label { font-size: 9px; letter-spacing: 0.15em; opacity: 0.45; text-transform: uppercase; margin-top: 4px; }
+.alltime-sub { font-size: 10px; opacity: 0.5; font-style: italic; margin-top: 2px; }
+.era-list {}
+.era-item {
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.aditi-era-item { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); }
+.narain-era-item { background: rgba(26,58,107,0.15); border: 1px solid rgba(201,146,26,0.1); }
+.era-item.current-era { border-color: rgba(201,168,76,0.4) !important; background: rgba(201,168,76,0.07) !important; }
+.narain-era-item.current-era { border-color: rgba(201,146,26,0.4) !important; background: rgba(201,146,26,0.08) !important; }
+.era-item-num {
+  font-size: 11px;
+  width: 20px;
+  text-align: center;
+  opacity: 0.4;
+  flex-shrink: 0;
+}
+.era-item-name { flex: 1; font-size: 13px; letter-spacing: 0.04em; }
+.era-item-narain-name { flex: 1; font-size: 13px; color: var(--narain-text); letter-spacing: 0.04em; }
+.era-item-narain-subtitle { font-size: 9px; color: var(--narain-accent); letter-spacing: 0.15em; opacity: 0.7; margin-top: 1px; }
+.era-item-threshold { font-size: 10px; opacity: 0.4; flex-shrink: 0; }
+.era-item-check { font-size: 13px; flex-shrink: 0; }
+
+/* Bottom nav */
+.bottom-nav {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  display: none;
+  align-items: center;
+  padding: 10px 8px;
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+  gap: 4px;
+  z-index: 100;
+}
+.bottom-nav.visible { display: flex; }
+.aditi-nav {
+  background: rgba(10,8,16,0.92);
+  border-top: 1px solid rgba(201,168,76,0.15);
+  backdrop-filter: blur(12px);
+}
+.narain-nav {
+  background: rgba(8,12,20,0.94);
+  border-top: 1px solid rgba(201,146,26,0.2);
+  backdrop-filter: blur(12px);
+}
+.nav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 8px 4px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  opacity: 0.45;
+}
+.nav-btn.active { opacity: 1; }
+.nav-icon { font-size: 18px; line-height: 1; }
+.nav-label { font-size: 8px; letter-spacing: 0.15em; text-transform: uppercase; }
+.aditi-nav .nav-btn.active .nav-label { color: #c9a84c; }
+.narain-nav .nav-btn.active .nav-label { color: var(--narain-accent); }
+.nav-switch {
+  flex: 0 0 auto;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: rgba(240,236,232,0.35);
+  padding: 8px 6px;
+  cursor: pointer;
+  text-align: center;
+}
+
+/* ===================== MODALS ===================== */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal-sheet {
+  width: 100%;
+  max-width: 480px;
+  border-radius: 20px 20px 0 0;
+  padding: 24px 24px 40px;
+  max-height: 80vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease;
+}
+@keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.aditi-modal { background: #1a1538; border-top: 1px solid rgba(201,168,76,0.2); }
+.narain-modal { background: #0d1527; border-top: 1px solid rgba(201,146,26,0.25); }
+.modal-handle {
+  width: 36px; height: 3px;
+  border-radius: 2px;
+  background: rgba(255,255,255,0.15);
+  margin: 0 auto 20px;
+}
+.modal-title {
+  font-size: 18px;
+  font-weight: 300;
+  font-style: italic;
+  letter-spacing: 0.06em;
+  text-align: center;
+  margin-bottom: 6px;
+}
+.modal-sub {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  opacity: 0.45;
+  text-align: center;
+  font-style: italic;
+  margin-bottom: 20px;
+}
+.modal-input {
+  width: 100%;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
+  padding: 14px;
+  color: #f0ece8;
+  font-family: 'Georgia', serif;
+  font-size: 14px;
+  margin-bottom: 10px;
+  resize: vertical;
+}
+.modal-input:focus { outline: none; border-color: rgba(201,168,76,0.4); }
+.narain-modal .modal-input:focus { border-color: rgba(201,146,26,0.4); }
+.modal-row { display: flex; gap: 10px; }
+.modal-btn {
+  flex: 1;
+  padding: 14px;
+  border-radius: 10px;
+  text-align: center;
+  cursor: pointer;
+  font-family: 'Georgia', serif;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  transition: all 0.2s;
+  border: 1px solid;
+}
+.modal-btn:active { transform: scale(0.97); }
+.btn-cancel { background: transparent; border-color: rgba(255,255,255,0.12); color: rgba(240,236,232,0.5); }
+.btn-confirm-aditi { background: rgba(201,168,76,0.15); border-color: rgba(201,168,76,0.4); color: #c9a84c; }
+.btn-confirm-narain { background: rgba(201,146,26,0.15); border-color: rgba(201,146,26,0.4); color: var(--narain-accent); }
+
+/* Curtain call modal */
+.curtain-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin: 16px 0;
+}
+.curtain-stat-card {
+  border-radius: 10px;
+  padding: 14px 10px;
+  text-align: center;
+}
+.aditi-curtain-stat { background: rgba(201,168,76,0.07); border: 1px solid rgba(201,168,76,0.15); }
+.narain-curtain-stat { background: rgba(26,58,107,0.2); border: 1px solid rgba(201,146,26,0.15); }
+.curtain-num {
+  font-size: 26px;
+  font-weight: 300;
+  letter-spacing: -0.01em;
+}
+.aditi-curtain-stat .curtain-num { color: #c9a84c; }
+.narain-curtain-stat .curtain-num { color: var(--narain-accent); }
+.curtain-label { font-size: 9px; letter-spacing: 0.15em; opacity: 0.45; text-transform: uppercase; margin-top: 4px; }
+
+/* Glossary */
+.glossary-btn {
+  position: fixed;
+  top: 16px; right: 16px;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  opacity: 0.35;
+  cursor: pointer;
+  z-index: 50;
+  padding: 6px 10px;
+}
+.glossary-item { margin-bottom: 16px; display: flex; gap: 12px; align-items: flex-start; }
+.glossary-icon { font-size: 16px; flex-shrink: 0; width: 24px; text-align: center; margin-top: 2px; }
+.glossary-text {}
+.glossary-term { font-size: 13px; letter-spacing: 0.05em; margin-bottom: 3px; }
+.glossary-def { font-size: 11px; opacity: 0.6; line-height: 1.6; font-style: italic; }
+
+/* Weekend toggle */
+.period-toggle {
+  display: flex;
+  gap: 0;
+  background: rgba(255,255,255,0.05);
+  border-radius: 10px;
+  padding: 3px;
+  margin: 0 24px 16px;
+}
+.period-btn {
+  flex: 1;
+  text-align: center;
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  opacity: 0.5;
+}
+.period-btn.active {
+  opacity: 1;
+}
+.aditi-period.active { background: rgba(201,168,76,0.15); color: #c9a84c; }
+.narain-period.active { background: rgba(201,146,26,0.15); color: var(--narain-accent); }
+
+/* Buyback life button */
+.buyback-btn {
+  margin: 0 24px;
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  font-style: italic;
+  opacity: 0.6;
+  transition: all 0.2s;
+  border: 1px dashed;
+}
+.buyback-btn:active { transform: scale(0.97); opacity: 1; }
+.aditi-buyback { border-color: rgba(201,168,76,0.2); }
+.narain-buyback { border-color: rgba(201,146,26,0.2); }
+
+/* Narain-specific styles */
+.narain-section-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 24px 14px;
+  opacity: 0.4;
+}
+.narain-divider-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(201,146,26,0.5), transparent);
+}
+.narain-divider-sym {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--narain-accent);
+}
+
+/* Narain rank display */
+.narain-rank-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(201,146,26,0.1);
+  border: 1px solid rgba(201,146,26,0.25);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--narain-accent);
+  margin-top: 6px;
+}
+
+/* Avengers badges (Narain eras-equivalent) */
+.avengers-badges-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.avengers-badge {
+  background: rgba(26,58,107,0.2);
+  border: 1px solid rgba(201,146,26,0.15);
+  border-radius: 12px;
+  padding: 14px 8px;
+  text-align: center;
+  position: relative;
+}
+.avengers-badge.unlocked { border-color: rgba(201,146,26,0.4); background: rgba(26,58,107,0.3); }
+.avengers-badge.locked { opacity: 0.35; filter: grayscale(0.6); }
+.badge-icon { font-size: 22px; margin-bottom: 4px; }
+.badge-name { font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--narain-accent); opacity: 0.8; }
+.badge-rank { font-size: 9px; opacity: 0.5; margin-top: 2px; font-style: italic; }
+
+/* BTS microcopy blocks */
+.bts-microcopy {
+  background: rgba(26,58,107,0.15);
+  border-left: 2px solid rgba(46,109,180,0.4);
+  border-radius: 0 8px 8px 0;
+  padding: 10px 14px;
+  margin: 8px 24px;
+  font-size: 11px;
+  font-style: italic;
+  color: var(--narain-dim);
+  line-height: 1.7;
+  letter-spacing: 0.02em;
+}
+.bts-attr {
+  font-size: 8px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--narain-blue-light);
+  opacity: 0.6;
+  margin-top: 6px;
+  display: block;
+}
+
+/* Dragon scroll separator */
+.scroll-sep {
+  text-align: center;
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  color: var(--narain-accent);
+  opacity: 0.3;
+  margin: 12px 0 4px;
+  font-style: italic;
+}
+
+/* Life display */
+.lives-display { display: flex; gap: 6px; justify-content: center; font-size: 18px; }
+.life-icon { transition: all 0.3s; }
+.life-icon.lost { opacity: 0.15; filter: grayscale(1); }
+
+/* Animations */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in { animation: fadeIn 0.4s ease forwards; }
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.stars-shimmer {
+  background: linear-gradient(90deg, #c9a84c 0%, #f0d080 50%, #c9a84c 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 3s linear infinite;
+}
+.narain-stars-shimmer {
+  background: linear-gradient(90deg, #c9921a 0%, #f0b832 50%, #c9921a 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 3s linear infinite;
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== SPLASH ===================== -->
+<div id="screen-splash" class="screen active">
+  <div class="splash-title">a family of eras</div>
+  <div class="splash-wordmark">LevelUp <em>Home</em></div>
+  <div class="splash-sub">long live the ones who showed up</div>
+  <div class="splash-status" id="splash-status">connecting…</div>
+</div>
+
+<!-- ===================== HOME ===================== -->
+<div id="screen-home" class="screen">
+  <div class="home-header">
+    <div class="home-eyebrow">welcome to your era</div>
+    <div class="home-wordmark">LevelUp <em>Home</em></div>
+    <div class="home-tagline">long live the ones who showed up</div>
+  </div>
+  <div class="profiles-grid">
+    <div class="profile-card" onclick="selectProfile('aditi')">
+      <div class="profile-avatar">🪩</div>
+      <div class="profile-name">Aditi</div>
+      <div class="profile-sub">a kind of becoming</div>
+    </div>
+    <div class="profile-card" onclick="selectProfile('narain')">
+      <div class="profile-avatar">🐼</div>
+      <div class="profile-name">Narain</div>
+      <div class="profile-sub">shadow village</div>
+    </div>
+    <div class="profile-card" onclick="selectProfile('mama')">
+      <div class="profile-avatar">🌸</div>
+      <div class="profile-name">Mama</div>
+      <div class="profile-sub">soft &amp; rooted</div>
+    </div>
+    <div class="profile-card" onclick="selectProfile('papa')">
+      <div class="profile-avatar">☯</div>
+      <div class="profile-name">Papa</div>
+      <div class="profile-sub">quiet discipline</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== PIN SCREEN ===================== -->
+<div id="screen-pin" class="screen">
+  <div class="pin-avatar" id="pin-avatar">🪩</div>
+  <div class="pin-title" id="pin-title">welcome back, <em>Aditi</em></div>
+  <div class="pin-sub" id="pin-sub">~ four small numbers, one open door ~</div>
+  <div class="pin-dots">
+    <div class="pin-dot" id="pd0"></div>
+    <div class="pin-dot" id="pd1"></div>
+    <div class="pin-dot" id="pd2"></div>
+    <div class="pin-dot" id="pd3"></div>
+  </div>
+  <div class="pin-error" id="pin-error"></div>
+  <div class="pin-keypad">
+    <div class="pin-key" onclick="pinInput('1')">1</div>
+    <div class="pin-key" onclick="pinInput('2')">2</div>
+    <div class="pin-key" onclick="pinInput('3')">3</div>
+    <div class="pin-key" onclick="pinInput('4')">4</div>
+    <div class="pin-key" onclick="pinInput('5')">5</div>
+    <div class="pin-key" onclick="pinInput('6')">6</div>
+    <div class="pin-key" onclick="pinInput('7')">7</div>
+    <div class="pin-key" onclick="pinInput('8')">8</div>
+    <div class="pin-key" onclick="pinInput('9')">9</div>
+    <div class="pin-key" style="opacity:0.15;pointer-events:none"></div>
+    <div class="pin-key" onclick="pinInput('0')">0</div>
+    <div class="pin-key del" onclick="pinDelete()">del</div>
+  </div>
+  <div class="pin-back" onclick="goHome()">← back</div>
+</div>
+
+<!-- ===================== ADITI PROFILE ===================== -->
+<div id="screen-aditi" class="screen">
+  <div class="glossary-btn" onclick="openGlossary('aditi')">?</div>
+
+  <div class="profile-header">
+    <div class="profile-header-avatar">🪩</div>
+    <div class="profile-header-name" style="color:#f0ece8;">welcome back, <em>Aditi</em></div>
+    <div class="profile-header-dash">—</div>
+    <div class="profile-header-era">currently in her <em id="aditi-era-name">debut</em> era</div>
+  </div>
+
+  <!-- Stats row -->
+  <div class="stats-row">
+    <div class="stat-card aditi-stat">
+      <div class="stat-number stars-shimmer" id="aditi-stars">0</div>
+      <div class="stat-label">stars</div>
+      <div class="stat-sub">earned, not given</div>
+    </div>
+    <div class="stat-card aditi-stat">
+      <div class="stat-number" id="aditi-streak">0</div>
+      <div class="stat-label">streak</div>
+      <div class="stat-sub">long live</div>
+    </div>
+    <div class="stat-card aditi-stat">
+      <div class="stat-number" id="aditi-freezes-display">🛡️ 3/3</div>
+      <div class="stat-label">freezes</div>
+      <div class="stat-sub">this month</div>
+    </div>
+  </div>
+  <div style="text-align:center;font-size:20px;letter-spacing:6px;margin:4px 0 8px;" id="aditi-lives-display">♡♡♡</div>
+
+  <!-- Era progress -->
+  <div class="section-label" id="aditi-era-label">DEBUT <em>era one</em></div>
+  <div class="era-progress-wrap">
+    <div class="era-progress-bar aditi-progress" id="aditi-era-bar" style="width:0%"></div>
+  </div>
+  <div class="era-progress-label" id="aditi-era-progress-label">0 / 50 — 50 stars to Fearless</div>
+
+  <!-- Boss -->
+  <div class="boss-section aditi-boss" style="margin-top:16px;">
+    <div class="boss-eyebrow">◆ the great war ◆</div>
+    <div class="boss-title">no boss challenge in motion</div>
+    <div class="boss-body">when the family takes on something big together, it lives here.</div>
+  </div>
+
+  <!-- Period toggle -->
+  <div class="task-section-header" style="margin-top:20px;">
+    <div class="task-section-title">today's <em>setlist</em></div>
+    <div class="task-count-badge aditi-badge" id="aditi-task-count">—</div>
+  </div>
+  <div class="period-toggle">
+    <div class="period-btn aditi-period active" id="aditi-weekday-btn" onclick="aditiSetPeriod('weekday')">Weekday</div>
+    <div class="period-btn aditi-period" id="aditi-weekend-btn" onclick="aditiSetPeriod('weekend')">Weekend</div>
+  </div>
+
+  <div class="tasks-container" id="aditi-tasks"></div>
+
+  <!-- Buyback -->
+  <div class="buyback-btn aditi-buyback" onclick="buybackLife('aditi')" id="aditi-buyback-btn" style="display:none;">
+    spend 50 stars to restore a life
+  </div>
+
+  <!-- Curtain call -->
+  <div class="curtain-btn aditi-curtain" onclick="openCurtainCall('aditi')">
+    <div class="curtain-title">✦ curtain call ✦</div>
+    <div class="curtain-sub">close <em>today's show</em></div>
+  </div>
+
+  <!-- Shop -->
+  <div class="section-label" style="margin-top:32px;">the <em>bejeweled</em> shop</div>
+  <div class="shop-section">
+    <div class="shop-header">
+      <div class="shop-sub">stars trade for something real</div>
+      <div class="shop-sub" style="margin-top:4px;">~ ✦ ~</div>
+    </div>
+    <div id="aditi-rewards"></div>
+    <div class="custom-reward-btn aditi-custom" onclick="openCustomReward('aditi')">
+      <div class="custom-reward-text">request a reward of your own</div>
+      <div class="shop-sub" style="margin-top:4px;">name it · price it in stars · mama &amp; papa decide</div>
+    </div>
+  </div>
+
+  <!-- Journal -->
+  <div class="section-label" style="margin-top:32px;">the <em>journal</em></div>
+  <div class="journal-section">
+    <div class="journal-header">
+      <div class="journal-sub">track five · always</div>
+    </div>
+    <div class="journal-quote aditi-journal-quote">
+      <div class="journal-quote-text">"some pages are not for performing. they are for being honest with yourself when nobody is watching — and trusting that the honesty itself is the work."</div>
+      <div class="journal-quote-attr">~ a note for the eldest daughter ~</div>
+    </div>
+    <div class="journal-entries" id="aditi-journal-entries"></div>
+    <div class="journal-new-btn aditi-new-btn" onclick="openJournal('aditi')">
+      <div class="journal-new-text">+ new entry</div>
+    </div>
+  </div>
+
+  <!-- Eras -->
+  <div class="section-label" style="margin-top:32px;">the <em>eras</em></div>
+  <div class="eras-section">
+    <div class="eras-header">
+      <div class="eras-sub">where she's been · where she's going</div>
+    </div>
+    <div class="eras-alltime-stats">
+      <div class="era-alltime-card aditi-alltime">
+        <div class="alltime-number" id="aditi-total-stars">0</div>
+        <div class="alltime-label">all-time stars</div>
+        <div class="alltime-sub">across the eras</div>
+      </div>
+      <div class="era-alltime-card aditi-alltime">
+        <div class="alltime-number" id="aditi-best-streak">0</div>
+        <div class="alltime-label">best streak</div>
+        <div class="alltime-sub">long lived</div>
+      </div>
+      <div class="era-alltime-card aditi-alltime">
+        <div class="alltime-number" id="aditi-freezes-left">3/3</div>
+        <div class="alltime-label">freezes left</div>
+        <div class="alltime-sub">this month</div>
+      </div>
+      <div class="era-alltime-card aditi-alltime">
+        <div class="alltime-number" id="aditi-journal-count">0</div>
+        <div class="alltime-label">journal entries</div>
+        <div class="alltime-sub">track 5 keeper</div>
+      </div>
+    </div>
+    <div class="era-list" id="aditi-era-list"></div>
+  </div>
+
+  <div style="height:20px;"></div>
+
+  <!-- Bottom nav -->
+  <div class="bottom-nav aditi-nav visible" id="aditi-nav">
+    <div class="nav-btn active" id="aditi-nav-today" onclick="aditiTab('today')">
+      <div class="nav-icon">☼</div>
+      <div class="nav-label">today</div>
+    </div>
+    <div class="nav-btn" id="aditi-nav-rewards" onclick="aditiTab('rewards')">
+      <div class="nav-icon">♢</div>
+      <div class="nav-label">rewards</div>
+    </div>
+    <div class="nav-btn" id="aditi-nav-journal" onclick="aditiTab('journal')">
+      <div class="nav-icon">✎</div>
+      <div class="nav-label">journal</div>
+    </div>
+    <div class="nav-btn" id="aditi-nav-eras" onclick="aditiTab('eras')">
+      <div class="nav-icon">◈</div>
+      <div class="nav-label">eras</div>
+    </div>
+    <div class="nav-switch" onclick="goHome()">← switch</div>
+  </div>
+</div>
+
+<!-- ===================== NARAIN PROFILE ===================== -->
+<div id="screen-narain" class="screen">
+  <div class="glossary-btn" onclick="openGlossary('narain')" style="color:rgba(201,146,26,0.5);">?</div>
+
+  <div class="profile-header">
+    <div class="profile-header-avatar">🐼</div>
+    <div class="profile-header-name" style="color:var(--narain-text);">welcome, <em>Narain</em></div>
+    <div class="profile-header-dash" style="opacity:0.4;">—</div>
+    <div class="narain-rank-badge" id="narain-rank-badge">
+      <span>🍃</span>
+      <span id="narain-era-name">Academy Student</span>
+    </div>
+  </div>
+
+  <!-- BTS microcopy opener -->
+  <div class="bts-microcopy">
+    the path forward is written in every jutsu you master, every scroll you complete. the village remembers who showed up.
+    <span class="bts-attr">~ shadow village dispatch ~</span>
+  </div>
+
+  <!-- Stats row -->
+  <div class="stats-row">
+    <div class="stat-card narain-stat">
+      <div class="stat-number narain-stars-shimmer" id="narain-stars">0</div>
+      <div class="stat-label">chakra pts</div>
+      <div class="stat-sub">earned, not given</div>
+    </div>
+    <div class="stat-card narain-stat">
+      <div class="stat-number" style="color:var(--narain-accent);" id="narain-streak">0</div>
+      <div class="stat-label">streak</div>
+      <div class="stat-sub">days trained</div>
+    </div>
+    <div class="stat-card narain-stat">
+      <div class="stat-number" style="color:var(--narain-blue-light);font-size:15px;" id="narain-freezes-display">🛡️ 3/3</div>
+      <div class="stat-label">scrolls</div>
+      <div class="stat-sub">this month</div>
+    </div>
+  </div>
+  <div style="text-align:center;font-size:20px;letter-spacing:6px;margin:4px 0 8px;" id="narain-lives-display">♡♡♡</div>
+
+  <!-- Era / Rank progress -->
+  <div class="narain-section-divider">
+    <div class="narain-divider-line"></div>
+    <div class="narain-divider-sym">rank progression</div>
+    <div class="narain-divider-line"></div>
+  </div>
+  <div class="section-label" style="margin-top:0;" id="narain-era-label">RANK I — ACADEMY STUDENT</div>
+  <div class="era-progress-wrap" style="margin:0 24px;">
+    <div class="era-progress-bar narain-progress" id="narain-era-bar" style="width:0%"></div>
+  </div>
+  <div class="era-progress-label" id="narain-era-progress-label">0 / 50 — 50 pts to Genin</div>
+
+  <!-- Dragon boss -->
+  <div class="boss-section narain-boss" style="margin-top:16px;">
+    <div class="boss-eyebrow" style="color:rgba(192,57,43,0.7);">🐉 dragon seal · village mission 🐉</div>
+    <div class="boss-title" style="color:var(--narain-text);">no S-rank mission active</div>
+    <div class="boss-body">when the clan takes on something legendary together, it appears here.</div>
+  </div>
+
+  <!-- Task section -->
+  <div class="task-section-header" style="margin-top:20px;">
+    <div class="task-section-title" style="color:var(--narain-dim);">today's <em>training scroll</em></div>
+    <div class="task-count-badge narain-badge" id="narain-task-count">—</div>
+  </div>
+  <div class="period-toggle">
+    <div class="period-btn narain-period active" id="narain-weekday-btn" onclick="narainSetPeriod('weekday')">Weekday</div>
+    <div class="period-btn narain-period" id="narain-weekend-btn" onclick="narainSetPeriod('weekend')">Weekend</div>
+  </div>
+
+  <div class="tasks-container" id="narain-tasks"></div>
+
+  <!-- Buyback -->
+  <div class="buyback-btn narain-buyback" onclick="buybackLife('narain')" id="narain-buyback-btn" style="display:none;color:var(--narain-dim);">
+    spend 50 chakra pts to restore a life
+  </div>
+
+  <!-- Curtain call -->
+  <div class="curtain-btn narain-curtain" onclick="openCurtainCall('narain')">
+    <div class="curtain-title" style="color:var(--narain-accent);">⛩ mission debrief ⛩</div>
+    <div class="curtain-sub">close <em>today's scroll</em></div>
+  </div>
+
+  <!-- Shop / Rewards -->
+  <div class="narain-section-divider">
+    <div class="narain-divider-line"></div>
+    <div class="narain-divider-sym">mission rewards</div>
+    <div class="narain-divider-line"></div>
+  </div>
+  <div class="section-label" style="margin-top:0;">the <em>reward vault</em></div>
+  <div class="shop-section">
+    <div class="shop-header">
+      <div class="shop-sub" style="color:var(--narain-dim);">chakra points unlock real rewards</div>
+      <div class="shop-sub" style="color:rgba(201,146,26,0.4);margin-top:4px;">— 🐉 —</div>
+    </div>
+    <div id="narain-rewards"></div>
+    <div class="custom-reward-btn narain-custom" onclick="openCustomReward('narain')">
+      <div class="custom-reward-text" style="color:var(--narain-dim);">submit a custom mission reward</div>
+      <div class="shop-sub" style="margin-top:4px;color:rgba(201,146,26,0.4);">name it · price it · parents approve</div>
+    </div>
+  </div>
+
+  <!-- Journal – "Shadow Chronicles" -->
+  <div class="narain-section-divider">
+    <div class="narain-divider-line"></div>
+    <div class="narain-divider-sym">shadow chronicles</div>
+    <div class="narain-divider-line"></div>
+  </div>
+  <div class="section-label" style="margin-top:0;">the <em>shadow chronicles</em></div>
+  <div class="journal-section">
+    <div class="journal-header">
+      <div class="journal-sub" style="color:var(--narain-dim);">training log · always honest</div>
+    </div>
+    <div class="journal-quote narain-journal-quote">
+      <div class="journal-quote-text" style="color:var(--narain-text);">"the hardest training is the training no one sees. the village does not watch every rep, every page, every early morning. but the ninja who becomes great is the one who did the work anyway — and wrote it down."</div>
+      <div class="journal-quote-attr" style="color:var(--narain-blue-light);">~ a note for the shadow in training ~</div>
+    </div>
+    <div class="journal-entries" id="narain-journal-entries"></div>
+    <div class="journal-new-btn narain-new-btn" onclick="openJournal('narain')">
+      <div class="journal-new-text" style="color:var(--narain-dim);">+ inscribe new entry</div>
+    </div>
+  </div>
+
+  <!-- Eras / Ranks -->
+  <div class="narain-section-divider">
+    <div class="narain-divider-line"></div>
+    <div class="narain-divider-sym">rank history</div>
+    <div class="narain-divider-line"></div>
+  </div>
+  <div class="section-label" style="margin-top:0;">the <em>ranks</em></div>
+  <div class="eras-section">
+    <div class="eras-header">
+      <div class="eras-sub" style="color:var(--narain-dim);">where he's been · where he's going</div>
+    </div>
+    <div class="eras-alltime-stats">
+      <div class="era-alltime-card narain-alltime">
+        <div class="alltime-number" id="narain-total-stars">0</div>
+        <div class="alltime-label">total chakra</div>
+        <div class="alltime-sub">across all ranks</div>
+      </div>
+      <div class="era-alltime-card narain-alltime">
+        <div class="alltime-number" id="narain-best-streak">0</div>
+        <div class="alltime-label">best streak</div>
+        <div class="alltime-sub">days trained</div>
+      </div>
+      <div class="era-alltime-card narain-alltime">
+        <div class="alltime-number" id="narain-freezes-left">3/3</div>
+        <div class="alltime-label">scroll seals</div>
+        <div class="alltime-sub">this month</div>
+      </div>
+      <div class="era-alltime-card narain-alltime">
+        <div class="alltime-number" id="narain-journal-count">0</div>
+        <div class="alltime-label">log entries</div>
+        <div class="alltime-sub">chronicles kept</div>
+      </div>
+    </div>
+
+    <!-- Avengers achievement badges -->
+    <div class="section-label" style="margin-top:8px;">avengers <em>achievement badges</em></div>
+    <div class="avengers-badges-grid" id="narain-avengers-badges"></div>
+
+    <div class="era-list" id="narain-era-list"></div>
+  </div>
+
+  <div style="height:20px;"></div>
+
+  <!-- Bottom nav -->
+  <div class="bottom-nav narain-nav visible" id="narain-nav">
+    <div class="nav-btn active" id="narain-nav-today" onclick="narainTab('today')">
+      <div class="nav-icon">⛩</div>
+      <div class="nav-label">scroll</div>
+    </div>
+    <div class="nav-btn" id="narain-nav-rewards" onclick="narainTab('rewards')">
+      <div class="nav-icon">🏆</div>
+      <div class="nav-label">vault</div>
+    </div>
+    <div class="nav-btn" id="narain-nav-journal" onclick="narainTab('journal')">
+      <div class="nav-icon">📜</div>
+      <div class="nav-label">chronicles</div>
+    </div>
+    <div class="nav-btn" id="narain-nav-eras" onclick="narainTab('eras')">
+      <div class="nav-icon">⚡</div>
+      <div class="nav-label">ranks</div>
+    </div>
+    <div class="nav-switch" onclick="goHome()" style="color:rgba(201,146,26,0.4);">← switch</div>
+  </div>
+</div>
+
+<!-- ===================== MAMA PLACEHOLDER ===================== -->
+<div id="screen-mama" class="screen">
+  <div class="placeholder-avatar">🌸</div>
+  <div class="placeholder-title">welcome, <em>Mama</em></div>
+  <div class="placeholder-sub">~ soft &amp; rooted ~<br><br>your garden is being planted. the seeds are in the soil. your space here will be quiet, warm, and entirely yours — very soon.</div>
+  <div class="placeholder-next">coming next · be well</div>
+  <div class="btn-back" onclick="goHome()">← switch</div>
+</div>
+
+<!-- ===================== PAPA PLACEHOLDER ===================== -->
+<div id="screen-papa" class="screen">
+  <div class="placeholder-avatar">☯</div>
+  <div class="placeholder-title">welcome, <em>Papa</em></div>
+  <div class="placeholder-sub">~ quiet discipline ~<br><br>the framework is set. the discipline begins with the build itself. your interface will be minimal, deliberate, and earned.</div>
+  <div class="placeholder-next">coming next · steady on</div>
+  <div class="btn-back" onclick="goHome()">← switch</div>
+</div>
+
+<!-- ===================== CUSTOM REWARD MODAL ===================== -->
+<div class="modal-overlay" id="modal-custom-reward">
+  <div class="modal-sheet" id="modal-custom-reward-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">request a <em>reward</em></div>
+    <div class="modal-sub">~ tell them what you want, and what it's worth ~</div>
+    <input class="modal-input" id="custom-reward-name" placeholder="what do you want?" style="height:44px;">
+    <input class="modal-input" id="custom-reward-stars" placeholder="how many stars?" type="number" style="height:44px;">
+    <div class="modal-row">
+      <div class="modal-btn btn-cancel" onclick="closeModal('modal-custom-reward')">never mind</div>
+      <div class="modal-btn btn-confirm-aditi" id="custom-reward-send" onclick="sendCustomReward()">send to parents</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== JOURNAL MODAL ===================== -->
+<div class="modal-overlay" id="modal-journal">
+  <div class="modal-sheet" id="modal-journal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">a new <em>entry</em></div>
+    <div class="modal-sub" id="modal-journal-sub">~ track five · be honest ~</div>
+    <textarea class="modal-input" id="journal-entry-text" placeholder="what happened today?" style="min-height:120px;"></textarea>
+    <div class="modal-row">
+      <div class="modal-btn btn-cancel" onclick="closeModal('modal-journal')">close</div>
+      <div class="modal-btn btn-confirm-aditi" id="journal-save-btn" onclick="saveJournalEntry()">save entry</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== GLOSSARY MODAL ===================== -->
+<div class="modal-overlay" id="modal-glossary">
+  <div class="modal-sheet" id="modal-glossary-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="glossary-title">the <em>glossary</em></div>
+    <div class="modal-sub" id="glossary-sub">~ a small key to all the symbols ~</div>
+    <div id="glossary-content"></div>
+    <div class="modal-btn btn-cancel" style="margin-top:16px;" onclick="closeModal('modal-glossary')">close</div>
+  </div>
+</div>
+
+<!-- ===================== CURTAIN CALL MODAL ===================== -->
+<div class="modal-overlay" id="modal-curtain">
+  <div class="modal-sheet" id="modal-curtain-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="curtain-title">✦ that's a wrap ✦</div>
+    <div class="modal-sub" id="curtain-sub">the <em>show</em> is done</div>
+    <div class="curtain-stat-grid" id="curtain-stats"></div>
+    <div style="text-align:center;font-size:11px;opacity:0.5;font-style:italic;margin-bottom:16px;" id="curtain-message">today went into the books.</div>
+    <div class="modal-btn btn-cancel" onclick="closeModal('modal-curtain')">close</div>
+  </div>
+</div>
+
+<!-- ===================== FIREBASE + APP LOGIC ===================== -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+// ── Firebase config ──
+const firebaseConfig = {
+  apiKey: "AIzaSyDmockKeyReplaceWithReal",
+  authDomain: "leveluphome.firebaseapp.com",
+  databaseURL: "https://leveluphome-default-rtdb.firebaseio.com",
+  projectId: "leveluphome",
+  storageBucket: "leveluphome.appspot.com",
+  messagingSenderId: "000000000000",
+  appId: "1:000000000000:web:000000000000000000000000"
+};
+
+let db;
+try {
+  const app = initializeApp(firebaseConfig);
+  db = getDatabase(app);
+  document.getElementById('splash-status').textContent = 'connected ✦';
+} catch(e) {
+  document.getElementById('splash-status').textContent = 'offline mode';
+}
+
+// ── Constants ──
+const PINS = { aditi: '1013', narain: '9001', mama: '2222', papa: '3333' };
+
+const ADITI_DAILY = [
+  { id:'a1', name:'Morning run / workout', type:'must', pts:2, time:'7am' },
+  { id:'a2', name:'Kumon worksheet', type:'must', pts:2 },
+  { id:'a3', name:'Supplements', type:'must', pts:1 },
+  { id:'a4', name:'Clean-up', type:'must', pts:2 },
+  { id:'a5', name:'Saxophone 15 min', type:'must', pts:2 },
+  { id:'a6', name:'Sleep schedule 7:30am / 10pm', type:'must', pts:2 },
+  { id:'a7', name:'Journal', type:'regular', pts:1 },
+  { id:'a8', name:'Read 30 min', type:'regular', pts:1 },
+  { id:'a9', name:'Creative project 15 min', type:'regular', pts:1 },
+];
+const ADITI_WEEKEND = [
+  { id:'aw1', name:'Bring clothes down', type:'must', pts:2 },
+  { id:'aw2', name:'Vacuum', type:'must', pts:2 },
+  { id:'aw3', name:'Oil hair', type:'must', pts:2 },
+  { id:'aw4', name:'Fold clothes', type:'must', pts:2 },
+  { id:'aw5', name:'Cook one new dish', type:'regular', pts:3, hidden:'hidden track' },
+];
+const ADITI_REWARDS = [
+  { stars:100, name:'+30 min screen time', detail:'auto-approved' },
+  { stars:200, name:'2hr gaming with friends', detail:'weekend only' },
+  { stars:500, name:'New book or art supply', detail:'$30 max' },
+  { stars:1000, name:'Spa day / big outing', detail:'mama decides' },
+];
+const ADITI_ERAS = [
+  { name:'Debut', threshold:0 },
+  { name:'Fearless', threshold:50 },
+  { name:'Speak Now', threshold:150 },
+  { name:'Red', threshold:300 },
+  { name:'1989', threshold:500 },
+  { name:'Reputation', threshold:750 },
+  { name:'Lover', threshold:1050 },
+  { name:'Folklore', threshold:1400 },
+  { name:'Evermore', threshold:1800 },
+  { name:'Midnights', threshold:2250 },
+  { name:'TTPD', threshold:2750 },
+  { name:'The Tortured Poets Dept.', threshold:3300 },
+];
+
+// ── NARAIN CONSTANTS ──
+const NARAIN_DAILY = [
+  { id:'n1', name:'Morning Exercise', jutsu:'Body Flicker Jutsu', type:'must', pts:2, time:'8am' },
+  { id:'n2', name:'Kumon Worksheet', jutsu:'Sealing Jutsu: Knowledge Scroll', type:'must', pts:2 },
+  { id:'n3', name:'Supplements', jutsu:'Soldier Pill Technique', type:'must', pts:1 },
+  { id:'n4', name:'Clean-up', jutsu:'Shadow Clone: Chores Division', type:'must', pts:2 },
+  { id:'n5', name:'Saxophone 15 min', jutsu:'Sound Release: Resonance Jutsu', type:'must', pts:2 },
+  { id:'n6', name:'Track & Field 30 min', jutsu:'Eight Gates: First Gate Training', type:'must', pts:2 },
+  { id:'n7', name:'Sleep Schedule (7:30am / 10pm)', jutsu:'Yin Release: Rest Restoration', type:'must', pts:2 },
+  { id:'n8', name:'Journal Entry', jutsu:'Shadow Chronicles Dispatch', type:'regular', pts:1 },
+  { id:'n9', name:'Read 30 min', jutsu:'Sage Mode: Perception Training', type:'regular', pts:1 },
+  { id:'n10', name:'New Hobby 15 min', jutsu:'Academy Jutsu: Skill Acquisition', type:'regular', pts:1 },
+];
+const NARAIN_WEEKEND = [
+  { id:'nw1', name:'Bring clothes down', jutsu:'Retrieval Mission', type:'must', pts:2 },
+  { id:'nw2', name:'Vacuum', jutsu:'Wind Style: Purge Technique', type:'must', pts:2 },
+  { id:'nw3', name:'Oil hair', jutsu:'Clan Ritual: Root Maintenance', type:'must', pts:2 },
+  { id:'nw4', name:'Fold clothes', jutsu:'Origami Seal: Garment Formation', type:'must', pts:2 },
+  { id:'nw5', name:'Learn to cook 1 new thing', jutsu:'Akimichi Secret: Feast Jutsu', type:'regular', pts:3, hidden:'dragon scroll' },
+];
+const NARAIN_REWARDS = [
+  { stars:100, name:'+30 min screen time', detail:'auto-approved · use wisely' },
+  { stars:200, name:'2hr gaming with friends', detail:'weekend mission · earn it' },
+  { stars:500, name:'Filament Spool ($50)', detail:'for the 3D forge' },
+  { stars:1000, name:'Multi-Filament Feeder', detail:'legendary upgrade · parents approve' },
+];
+const NARAIN_ERAS = [
+  { name:'Academy Student', subtitle:'D-Rank', symbol:'🌱', threshold:0 },
+  { name:'Genin', subtitle:'C-Rank', symbol:'🍃', threshold:50 },
+  { name:'Chunin', subtitle:'B-Rank', symbol:'⚔️', threshold:150 },
+  { name:'Special Jonin', subtitle:'B+-Rank', symbol:'🌀', threshold:300 },
+  { name:'Jonin', subtitle:'A-Rank', symbol:'⚡', threshold:500 },
+  { name:'ANBU', subtitle:'A+-Rank • Shadow Ops', symbol:'🐼', threshold:750 },
+  { name:'Sannin', subtitle:'S-Rank Legendary', symbol:'🐍', threshold:1050 },
+  { name:'Kage', subtitle:'Village Leader', symbol:'🏔️', threshold:1400 },
+  { name:'S-Rank', subtitle:'Most Wanted', symbol:'🔥', threshold:1800 },
+  { name:'Legendary Sannin', subtitle:'Beyond Kage', symbol:'🐸', threshold:2250 },
+  { name:'Sage of Six Paths', subtitle:'Truth-Seeker', symbol:'☮️', threshold:2750 },
+  { name:'Hokage', subtitle:'Shadow That Protects All', symbol:'🦊', threshold:3300 },
+];
+
+const NARAIN_AVENGERS_BADGES = [
+  { icon:'🦾', name:'Iron Will', rank:'5 streak days', condition:'streak', threshold:5 },
+  { icon:'🛡️', name:'Vibranium Shield', rank:'100 pts earned', condition:'stars', threshold:100 },
+  { icon:'⚡', name:'Thunder God', rank:'200 pts earned', condition:'stars', threshold:200 },
+  { icon:'🕷️', name:'Spider Sense', rank:'30 tasks complete', condition:'tasks', threshold:30 },
+  { icon:'🪄', name:'Sorcerer Supreme', rank:'10 journal entries', condition:'journal', threshold:10 },
+  { icon:'💚', name:'Strongest Avenger', rank:'Reach Jonin rank', condition:'era', threshold:4 },
+];
+
+// ── State ──
+let currentProfile = null;
+let pinBuffer = '';
+let aditiState = null;
+let narainState = null;
+let activeJournalProfile = null;
+let activeRewardProfile = null;
+let aditiPeriod = 'weekday';
+let narainPeriod = 'weekday';
+
+// ── Helpers ──
+function today() {
+  return new Date().toISOString().split('T')[0];
+}
+function monthKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+}
+function $ (id) { return document.getElementById(id); }
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.bottom-nav').forEach(n => n.classList.remove('visible'));
+  $(id).classList.add('active');
+  if (id === 'screen-aditi') { $('aditi-nav').classList.add('visible'); }
+  if (id === 'screen-narain') { $('narain-nav').classList.add('visible'); }
+  $(id).scrollTop = 0;
+}
+
+// ── Default state factories ──
+function defaultAditiState() {
+  return {
+    stars: 0, streak: 0, lives: 3, freezes: 3,
+    totalStars: 0, bestStreak: 0, journalCount: 0,
+    dailyCompletions: {}, monthKey: monthKey(),
+    journals: [],
+  };
+}
+function defaultNarainState() {
+  return {
+    stars: 0, streak: 0, lives: 3, freezes: 3,
+    totalStars: 0, bestStreak: 0, journalCount: 0,
+    tasksDone: 0,
+    dailyCompletions: {}, monthKey: monthKey(),
+    journals: [],
+  };
+}
+
+// ── Firebase save/load ──
+async function saveState(profile, state) {
+  if (!db) return;
+  try {
+    await set(ref(db, `profiles/${profile}`), state);
+  } catch(e) { console.warn('Save failed', e); }
+}
+
+async function loadState(profile) {
+  if (!db) return null;
+  try {
+    const snap = await get(ref(db, `profiles/${profile}`));
+    return snap.exists() ? snap.val() : null;
+  } catch(e) { return null; }
+}
+
+// ── Monthly reset engine (generalized) ──
+function checkMonthlyReset(state, profile) {
+  const mk = monthKey();
+  if (state.monthKey !== mk) {
+    state.monthKey = mk;
+    state.lives = 3;
+    state.freezes = 3;
+    state.dailyCompletions = {};
+  }
+  return state;
+}
+
+// ── Daily completion reset ──
+function getTodayCompletions(state) {
+  const t = today();
+  if (!state.dailyCompletions) state.dailyCompletions = {};
+  if (!state.dailyCompletions[t]) state.dailyCompletions[t] = {};
+  return state.dailyCompletions[t];
+}
+
+// ── Era/Rank calculator ──
+function getCurrentEra(stars, eras) {
+  let current = 0;
+  for (let i = eras.length - 1; i >= 0; i--) {
+    if (stars >= eras[i].threshold) { current = i; break; }
+  }
+  return current;
+}
+
+// ── Navigation ──
+window.goHome = function() {
+  showScreen('screen-home');
+};
+
+window.selectProfile = function(profile) {
+  currentProfile = profile;
+  const info = {
+    aditi: { avatar:'🪩', title:"welcome back, <em>Aditi</em>", sub:'~ four small numbers, one open door ~', bg:'aditi-bg' },
+    narain: { avatar:'🐼', title:"welcome, <em>Narain</em>", sub:'~ your village awaits ~', bg:'narain-bg' },
+    mama: { avatar:'🌸', title:"welcome, <em>Mama</em>", sub:'~ always home ~', bg:'mama-bg' },
+    papa: { avatar:'☯', title:"welcome, <em>Papa</em>", sub:'~ steady on ~', bg:'papa-bg' },
+  };
+  const inf = info[profile];
+  $('pin-avatar').textContent = inf.avatar;
+  $('pin-title').innerHTML = inf.title;
+  $('pin-sub').textContent = inf.sub;
+  $('pin-error').textContent = '';
+  pinBuffer = '';
+  updatePinDots();
+  const pin = $('screen-pin');
+  pin.className = 'screen';
+  pin.classList.add(inf.bg);
+  showScreen('screen-pin');
+};
+
+window.pinInput = function(digit) {
+  if (pinBuffer.length >= 4) return;
+  pinBuffer += digit;
+  updatePinDots();
+  if (pinBuffer.length === 4) {
+    setTimeout(checkPin, 120);
+  }
+};
+window.pinDelete = function() {
+  pinBuffer = pinBuffer.slice(0, -1);
+  updatePinDots();
+  $('pin-error').textContent = '';
+};
+
+function updatePinDots() {
+  for (let i = 0; i < 4; i++) {
+    $(` pd${i}`);
+    document.getElementById('pd'+i).classList.toggle('filled', i < pinBuffer.length);
+  }
+}
+
+function checkPin() {
+  const correct = PINS[currentProfile];
+  if (pinBuffer === correct) {
+    $('pin-error').textContent = '';
+    enterProfile(currentProfile);
+  } else {
+    $('pin-error').textContent = "that wasn't quite it. try again.";
+    pinBuffer = '';
+    updatePinDots();
+    const pin = $('screen-pin');
+    pin.style.animation = 'none';
+    pin.offsetHeight;
+    pin.style.animation = '';
+  }
+}
+
+async function enterProfile(profile) {
+  if (profile === 'aditi') {
+    let loaded = await loadState('aditi');
+    aditiState = loaded ? checkMonthlyReset(loaded, 'aditi') : defaultAditiState();
+    renderAditi();
+    showScreen('screen-aditi');
+    aditiTab('today');
+  } else if (profile === 'narain') {
+    let loaded = await loadState('narain');
+    narainState = loaded ? checkMonthlyReset(loaded, 'narain') : defaultNarainState();
+    renderNarain();
+    showScreen('screen-narain');
+    narainTab('today');
+  } else if (profile === 'mama') {
+    showScreen('screen-mama');
+  } else if (profile === 'papa') {
+    showScreen('screen-papa');
+  }
+}
+
+// ═══════════════════════════════════════════
+// ── ADITI RENDER & LOGIC ──
+// ═══════════════════════════════════════════
+function renderAditi() {
+  const s = aditiState;
+  const eraIdx = getCurrentEra(s.stars, ADITI_ERAS);
+  const era = ADITI_ERAS[eraIdx];
+  const nextEra = ADITI_ERAS[eraIdx + 1];
+
+  $('aditi-era-name').textContent = era.name.toLowerCase();
+  $('aditi-stars').textContent = s.stars;
+  $('aditi-streak').textContent = s.streak;
+  $('aditi-freezes-display').textContent = `🛡️ ${s.freezes}/3`;
+  $('aditi-total-stars').textContent = s.totalStars || s.stars;
+  $('aditi-best-streak').textContent = s.bestStreak || s.streak;
+  $('aditi-freezes-left').textContent = `${s.freezes}/3`;
+  $('aditi-journal-count').textContent = (s.journals || []).length;
+
+  // Lives
+  let livesHtml = '';
+  for (let i = 0; i < 3; i++) livesHtml += `<span class="life-icon${i >= s.lives ? ' lost' : ''}">♡</span>`;
+  $('aditi-lives-display').innerHTML = livesHtml;
+
+  // Era progress
+  const threshold = era.threshold;
+  const nextThreshold = nextEra ? nextEra.threshold : threshold;
+  const progress = nextEra ? Math.min(100, ((s.stars - threshold) / (nextThreshold - threshold)) * 100) : 100;
+  $('aditi-era-bar').style.width = progress + '%';
+  $('aditi-era-label').innerHTML = `${era.name.toUpperCase()} <em>era ${eraIdx + 1}</em>`;
+  $('aditi-era-progress-label').textContent = nextEra
+    ? `${s.stars} / ${nextThreshold} — ${nextThreshold - s.stars} stars to ${nextEra.name}`
+    : `${s.stars} — maximum era reached`;
+
+  // Buyback
+  $('aditi-buyback-btn').style.display = s.lives < 3 && s.stars >= 50 ? 'block' : 'none';
+
+  renderAditiTasks();
+  renderAditiRewards();
+  renderAditiJournal();
+  renderAditiEras();
+}
+
+function renderAditiTasks() {
+  const s = aditiState;
+  const tasks = aditiPeriod === 'weekday' ? ADITI_DAILY : ADITI_WEEKEND;
+  const completions = getTodayCompletions(s);
+  const container = $('aditi-tasks');
+  container.innerHTML = '';
+  let done = 0;
+  tasks.forEach(task => {
+    const isDone = !!completions[task.id];
+    if (isDone) done++;
+    const card = document.createElement('div');
+    card.className = `task-card aditi-task ${task.type}${isDone ? ' done' : ''}`;
+    card.innerHTML = `
+      <div class="task-check ${isDone ? 'checked' : ''}">${isDone ? '✓' : ''}</div>
+      <div class="task-info">
+        <div class="task-name">${task.name}${task.hidden ? ` <span style="font-size:9px;opacity:0.4;letter-spacing:0.15em;">(${task.hidden})</span>` : ''}</div>
+        <div class="task-meta">${task.type === 'must' ? '◆ must-do' : '○ regular'}${task.time ? ' · ' + task.time : ''}</div>
+      </div>
+      <div class="task-pts">${task.pts}pt${task.pts > 1 ? 's' : ''}</div>`;
+    card.onclick = () => toggleAditiTask(task);
+    container.appendChild(card);
+  });
+  $('aditi-task-count').textContent = `${done}/${tasks.length}`;
+}
+
+function toggleAditiTask(task) {
+  const s = aditiState;
+  const completions = getTodayCompletions(s);
+  if (completions[task.id]) {
+    delete completions[task.id];
+    s.stars = Math.max(0, s.stars - task.pts);
+  } else {
+    completions[task.id] = true;
+    s.stars += task.pts;
+    if (!s.totalStars) s.totalStars = 0;
+    s.totalStars += task.pts;
+  }
+  saveState('aditi', s);
+  renderAditi();
+}
+
+function renderAditiRewards() {
+  const container = $('aditi-rewards');
+  container.innerHTML = '';
+  ADITI_REWARDS.forEach(r => {
+    const card = document.createElement('div');
+    card.className = 'reward-card aditi-reward';
+    card.innerHTML = `
+      <div style="text-align:center;min-width:44px;">
+        <div class="reward-stars">${r.stars}</div>
+        <div class="reward-stars-label">stars</div>
+      </div>
+      <div class="reward-info">
+        <div class="reward-name">${r.name}</div>
+        <div class="reward-detail">${r.detail}</div>
+      </div>
+      <div class="reward-arrow">›</div>`;
+    container.appendChild(card);
+  });
+}
+
+function renderAditiJournal() {
+  const container = $('aditi-journal-entries');
+  container.innerHTML = '';
+  const journals = (aditiState.journals || []).slice().reverse().slice(0, 5);
+  journals.forEach(j => {
+    const div = document.createElement('div');
+    div.className = 'journal-entry-item aditi-entry';
+    div.innerHTML = `<div class="entry-date">${j.date}</div><div class="entry-text">${j.text}</div>`;
+    container.appendChild(div);
+  });
+  $('aditi-journal-count').textContent = (aditiState.journals || []).length;
+}
+
+function renderAditiEras() {
+  const container = $('aditi-era-list');
+  container.innerHTML = '';
+  const eraIdx = getCurrentEra(aditiState.stars, ADITI_ERAS);
+  ADITI_ERAS.forEach((era, i) => {
+    const div = document.createElement('div');
+    const isCurrent = i === eraIdx;
+    const isUnlocked = aditiState.stars >= era.threshold;
+    div.className = `era-item aditi-era-item${isCurrent ? ' current-era' : ''}`;
+    div.innerHTML = `
+      <div class="era-item-num">${i+1}</div>
+      <div class="era-item-name">${era.name}${isCurrent ? ' <span style="font-size:9px;color:#c9a84c;letter-spacing:0.1em;">← now</span>' : ''}</div>
+      <div class="era-item-threshold">${era.threshold} ✦</div>
+      <div class="era-item-check">${isUnlocked ? '✓' : '○'}</div>`;
+    if (!isUnlocked) div.style.opacity = '0.35';
+    container.appendChild(div);
+  });
+}
+
+window.aditiTab = function(tab) {
+  const sections = { today: 0, rewards: 1, journal: 2, eras: 3 };
+  const navIds = ['aditi-nav-today','aditi-nav-rewards','aditi-nav-journal','aditi-nav-eras'];
+  navIds.forEach((id, i) => {
+    $(id).classList.toggle('active', Object.keys(sections)[i] === tab);
+  });
+  const screen = $('screen-aditi');
+  const targets = {
+    today: screen.querySelector('.stats-row'),
+    rewards: screen.querySelector('.shop-section'),
+    journal: screen.querySelector('.journal-section'),
+    eras: screen.querySelector('.eras-section'),
+  };
+  if (targets[tab]) targets[tab].scrollIntoView({ behavior:'smooth', block:'start' });
+};
+
+window.aditiSetPeriod = function(period) {
+  aditiPeriod = period;
+  $('aditi-weekday-btn').classList.toggle('active', period === 'weekday');
+  $('aditi-weekend-btn').classList.toggle('active', period === 'weekend');
+  renderAditiTasks();
+};
+
+// ═══════════════════════════════════════════
+// ── NARAIN RENDER & LOGIC ──
+// ═══════════════════════════════════════════
+function renderNarain() {
+  const s = narainState;
+  const eraIdx = getCurrentEra(s.stars, NARAIN_ERAS);
+  const era = NARAIN_ERAS[eraIdx];
+  const nextEra = NARAIN_ERAS[eraIdx + 1];
+
+  $('narain-era-name').textContent = era.name;
+  $('narain-rank-badge').querySelector('span').textContent = era.symbol || '🍃';
+  $('narain-stars').textContent = s.stars;
+  $('narain-streak').textContent = s.streak;
+  $('narain-freezes-display').textContent = `🛡️ ${s.freezes}/3`;
+  $('narain-total-stars').textContent = s.totalStars || s.stars;
+  $('narain-best-streak').textContent = s.bestStreak || s.streak;
+  $('narain-freezes-left').textContent = `${s.freezes}/3`;
+  $('narain-journal-count').textContent = (s.journals || []).length;
+
+  // Lives
+  let livesHtml = '';
+  for (let i = 0; i < 3; i++) livesHtml += `<span class="life-icon${i >= s.lives ? ' lost' : ''}">♡</span>`;
+  $('narain-lives-display').innerHTML = livesHtml;
+
+  // Rank progress
+  const threshold = era.threshold;
+  const nextThreshold = nextEra ? nextEra.threshold : threshold;
+  const progress = nextEra ? Math.min(100, ((s.stars - threshold) / (nextThreshold - threshold)) * 100) : 100;
+  $('narain-era-bar').style.width = progress + '%';
+  $('narain-era-label').textContent = `RANK ${eraIdx + 1} — ${era.name.toUpperCase()}`;
+  $('narain-era-progress-label').textContent = nextEra
+    ? `${s.stars} / ${nextThreshold} — ${nextThreshold - s.stars} pts to ${nextEra.name}`
+    : `${s.stars} — Hokage achieved. the village is proud.`;
+
+  // Buyback
+  $('narain-buyback-btn').style.display = s.lives < 3 && s.stars >= 50 ? 'block' : 'none';
+
+  renderNarainTasks();
+  renderNarainRewards();
+  renderNarainJournal();
+  renderNarainEras();
+  renderAvengers();
+}
+
+function renderNarainTasks() {
+  const s = narainState;
+  const tasks = narainPeriod === 'weekday' ? NARAIN_DAILY : NARAIN_WEEKEND;
+  const completions = getTodayCompletions(s);
+  const container = $('narain-tasks');
+  container.innerHTML = '';
+  let done = 0;
+  tasks.forEach(task => {
+    const isDone = !!completions[task.id];
+    if (isDone) done++;
+    const card = document.createElement('div');
+    card.className = `task-card narain-task ${task.type}${isDone ? ' done' : ''}`;
+    card.innerHTML = `
+      <div class="task-check ${isDone ? 'checked' : ''}">${isDone ? '✓' : ''}</div>
+      <div class="task-info">
+        <div class="task-jutsu">${task.jutsu}</div>
+        <div class="task-narain-name">${task.name}${task.hidden ? ` <span style="font-size:9px;color:var(--narain-accent);opacity:0.4;letter-spacing:0.1em;">[${task.hidden}]</span>` : ''}</div>
+        <div class="task-meta" style="color:var(--narain-dim);">${task.type === 'must' ? '◆ required jutsu' : '○ bonus training'}${task.time ? ' · ' + task.time : ''}</div>
+      </div>
+      <div class="task-pts" style="color:var(--narain-accent);">${task.pts}pt${task.pts > 1 ? 's' : ''}</div>`;
+    card.onclick = () => toggleNarainTask(task);
+    container.appendChild(card);
+  });
+  $('narain-task-count').textContent = `${done}/${tasks.length}`;
+}
+
+function toggleNarainTask(task) {
+  const s = narainState;
+  const completions = getTodayCompletions(s);
+  if (completions[task.id]) {
+    delete completions[task.id];
+    s.stars = Math.max(0, s.stars - task.pts);
+  } else {
+    completions[task.id] = true;
+    s.stars += task.pts;
+    if (!s.totalStars) s.totalStars = 0;
+    s.totalStars += task.pts;
+    if (!s.tasksDone) s.tasksDone = 0;
+    s.tasksDone++;
+  }
+  saveState('narain', s);
+  renderNarain();
+}
+
+function renderNarainRewards() {
+  const container = $('narain-rewards');
+  container.innerHTML = '';
+  NARAIN_REWARDS.forEach(r => {
+    const card = document.createElement('div');
+    card.className = 'reward-card narain-reward';
+    card.innerHTML = `
+      <div style="text-align:center;min-width:44px;">
+        <div class="reward-stars" style="color:var(--narain-accent);">${r.stars}</div>
+        <div class="reward-stars-label">pts</div>
+      </div>
+      <div class="reward-info">
+        <div class="reward-narain-name">${r.name}</div>
+        <div class="reward-detail" style="color:var(--narain-dim);">${r.detail}</div>
+      </div>
+      <div class="reward-arrow" style="color:var(--narain-accent);">›</div>`;
+    container.appendChild(card);
+  });
+}
+
+function renderNarainJournal() {
+  const container = $('narain-journal-entries');
+  container.innerHTML = '';
+  const journals = (narainState.journals || []).slice().reverse().slice(0, 5);
+  journals.forEach(j => {
+    const div = document.createElement('div');
+    div.className = 'journal-entry-item narain-entry';
+    div.innerHTML = `<div class="entry-date" style="color:var(--narain-accent);opacity:0.6;">${j.date}</div><div class="entry-text" style="color:var(--narain-dim);">${j.text}</div>`;
+    container.appendChild(div);
+  });
+  $('narain-journal-count').textContent = (narainState.journals || []).length;
+}
+
+function renderNarainEras() {
+  const container = $('narain-era-list');
+  container.innerHTML = '';
+  const eraIdx = getCurrentEra(narainState.stars, NARAIN_ERAS);
+  NARAIN_ERAS.forEach((era, i) => {
+    const div = document.createElement('div');
+    const isCurrent = i === eraIdx;
+    const isUnlocked = narainState.stars >= era.threshold;
+    div.className = `era-item narain-era-item${isCurrent ? ' current-era' : ''}`;
+    div.innerHTML = `
+      <div class="era-item-num" style="color:var(--narain-accent);">${era.symbol}</div>
+      <div class="era-item-info" style="flex:1;">
+        <div class="era-item-narain-name">${era.name}${isCurrent ? ' <span style="font-size:9px;color:var(--narain-accent);letter-spacing:0.1em;">← active</span>' : ''}</div>
+        <div class="era-item-narain-subtitle">${era.subtitle}</div>
+      </div>
+      <div class="era-item-threshold" style="color:var(--narain-dim);">${era.threshold} ⚡</div>
+      <div class="era-item-check" style="color:var(--narain-accent);">${isUnlocked ? '✓' : '○'}</div>`;
+    if (!isUnlocked) div.style.opacity = '0.3';
+    container.appendChild(div);
+  });
+}
+
+function renderAvengers() {
+  const container = $('narain-avengers-badges');
+  container.innerHTML = '';
+  const s = narainState;
+  const eraIdx = getCurrentEra(s.stars, NARAIN_ERAS);
+  const journalCount = (s.journals || []).length;
+  NARAIN_AVENGERS_BADGES.forEach(badge => {
+    let unlocked = false;
+    if (badge.condition === 'streak') unlocked = s.streak >= badge.threshold;
+    if (badge.condition === 'stars') unlocked = (s.totalStars || s.stars) >= badge.threshold;
+    if (badge.condition === 'tasks') unlocked = (s.tasksDone || 0) >= badge.threshold;
+    if (badge.condition === 'journal') unlocked = journalCount >= badge.threshold;
+    if (badge.condition === 'era') unlocked = eraIdx >= badge.threshold;
+    const div = document.createElement('div');
+    div.className = `avengers-badge ${unlocked ? 'unlocked' : 'locked'}`;
+    div.innerHTML = `
+      <div class="badge-icon">${badge.icon}</div>
+      <div class="badge-name">${badge.name}</div>
+      <div class="badge-rank">${badge.rank}</div>`;
+    container.appendChild(div);
+  });
+}
+
+window.narainTab = function(tab) {
+  const tabs = ['today','rewards','journal','eras'];
+  const navIds = ['narain-nav-today','narain-nav-rewards','narain-nav-journal','narain-nav-eras'];
+  navIds.forEach((id, i) => {
+    $(id).classList.toggle('active', tabs[i] === tab);
+  });
+  const screen = $('screen-narain');
+  const targets = {
+    today: screen.querySelector('.stats-row'),
+    rewards: screen.querySelector('.shop-section'),
+    journal: screen.querySelector('.journal-section'),
+    eras: screen.querySelector('.eras-section'),
+  };
+  if (targets[tab]) targets[tab].scrollIntoView({ behavior:'smooth', block:'start' });
+};
+
+window.narainSetPeriod = function(period) {
+  narainPeriod = period;
+  $('narain-weekday-btn').classList.toggle('active', period === 'weekday');
+  $('narain-weekend-btn').classList.toggle('active', period === 'weekend');
+  renderNarainTasks();
+};
+
+// ── Buyback life ──
+window.buybackLife = function(profile) {
+  if (profile === 'aditi') {
+    if (aditiState.stars < 50 || aditiState.lives >= 3) return;
+    aditiState.stars -= 50;
+    aditiState.lives = Math.min(3, aditiState.lives + 1);
+    saveState('aditi', aditiState);
+    renderAditi();
+  } else if (profile === 'narain') {
+    if (narainState.stars < 50 || narainState.lives >= 3) return;
+    narainState.stars -= 50;
+    narainState.lives = Math.min(3, narainState.lives + 1);
+    saveState('narain', narainState);
+    renderNarain();
+  }
+};
+
+// ── Custom reward modal ──
+window.openCustomReward = function(profile) {
+  activeRewardProfile = profile;
+  const sheet = $('modal-custom-reward-sheet');
+  const btn = $('custom-reward-send');
+  if (profile === 'narain') {
+    sheet.className = 'modal-sheet narain-modal';
+    btn.className = 'modal-btn btn-confirm-narain';
+  } else {
+    sheet.className = 'modal-sheet aditi-modal';
+    btn.className = 'modal-btn btn-confirm-aditi';
+  }
+  $('custom-reward-name').value = '';
+  $('custom-reward-stars').value = '';
+  $('modal-custom-reward').classList.add('open');
+};
+
+window.sendCustomReward = function() {
+  const name = $('custom-reward-name').value.trim();
+  const stars = $('custom-reward-stars').value.trim();
+  if (!name) return;
+  closeModal('modal-custom-reward');
+};
+
+// ── Journal modal ──
+window.openJournal = function(profile) {
+  activeJournalProfile = profile;
+  const sheet = $('modal-journal-sheet');
+  const btn = $('journal-save-btn');
+  const sub = $('modal-journal-sub');
+  if (profile === 'narain') {
+    sheet.className = 'modal-sheet narain-modal';
+    btn.className = 'modal-btn btn-confirm-narain';
+    $('modal-journal').querySelector('.modal-title').innerHTML = 'new <em>chronicle entry</em>';
+    sub.textContent = '~ shadow chronicles · be honest ~';
+  } else {
+    sheet.className = 'modal-sheet aditi-modal';
+    btn.className = 'modal-btn btn-confirm-aditi';
+    $('modal-journal').querySelector('.modal-title').innerHTML = 'a new <em>entry</em>';
+    sub.textContent = '~ track five · be honest ~';
+  }
+  $('journal-entry-text').value = '';
+  $('modal-journal').classList.add('open');
+};
+
+window.saveJournalEntry = function() {
+  const text = $('journal-entry-text').value.trim();
+  if (!text) return;
+  const entry = { date: today(), text };
+  if (activeJournalProfile === 'aditi') {
+    if (!aditiState.journals) aditiState.journals = [];
+    aditiState.journals.push(entry);
+    saveState('aditi', aditiState);
+    renderAditi();
+  } else if (activeJournalProfile === 'narain') {
+    if (!narainState.journals) narainState.journals = [];
+    narainState.journals.push(entry);
+    saveState('narain', narainState);
+    renderNarain();
+  }
+  closeModal('modal-journal');
+};
+
+// ── Curtain call ──
+window.openCurtainCall = function(profile) {
+  const sheet = $('modal-curtain-sheet');
+  const statsEl = $('curtain-stats');
+  let s, tasks, title, sub, statClass;
+  if (profile === 'aditi') {
+    s = aditiState;
+    tasks = aditiPeriod === 'weekday' ? ADITI_DAILY : ADITI_WEEKEND;
+    title = '✦ curtain call ✦';
+    sub = 'the <em>show</em> is done';
+    statClass = 'aditi-curtain-stat';
+    sheet.className = 'modal-sheet aditi-modal';
+  } else {
+    s = narainState;
+    tasks = narainPeriod === 'weekday' ? NARAIN_DAILY : NARAIN_WEEKEND;
+    title = '⛩ mission debrief ⛩';
+    sub = 'scroll <em>complete</em>';
+    statClass = 'narain-curtain-stat';
+    sheet.className = 'modal-sheet narain-modal';
+  }
+  $('curtain-title').textContent = title.replace(/<[^>]+>/g,'');
+  $('curtain-sub').innerHTML = sub;
+  const completions = getTodayCompletions(s);
+  const done = tasks.filter(t => completions[t.id]).length;
+  const mustDone = tasks.filter(t => t.type === 'must' && completions[t.id]).length;
+  const mustTotal = tasks.filter(t => t.type === 'must').length;
+  const eraIdx = getCurrentEra(s.stars, profile === 'aditi' ? ADITI_ERAS : NARAIN_ERAS);
+  const eras = profile === 'aditi' ? ADITI_ERAS : NARAIN_ERAS;
+  const era = eras[eraIdx];
+  const next = eras[eraIdx+1];
+  const pct = next ? Math.min(100, Math.round(((s.stars - era.threshold)/(next.threshold - era.threshold))*100)) : 100;
+  const pts = tasks.filter(t => completions[t.id]).reduce((a,t) => a + t.pts, 0);
+  const numColor = profile === 'narain' ? 'var(--narain-accent)' : '#c9a84c';
+  statsEl.innerHTML = `
+    <div class="curtain-stat-card ${statClass}">
+      <div class="curtain-num" style="color:${numColor};">${pts}</div>
+      <div class="curtain-label">stars today</div>
+    </div>
+    <div class="curtain-stat-card ${statClass}">
+      <div class="curtain-num" style="color:${numColor};">${mustDone}/${mustTotal}</div>
+      <div class="curtain-label">must-dos hit</div>
+    </div>
+    <div class="curtain-stat-card ${statClass}">
+      <div class="curtain-num" style="color:${numColor};">${s.streak}</div>
+      <div class="curtain-label">streak</div>
+    </div>
+    <div class="curtain-stat-card ${statClass}">
+      <div class="curtain-num" style="color:${numColor};">${pct}%</div>
+      <div class="curtain-label">era progress</div>
+    </div>`;
+  $('curtain-message').textContent = mustDone === mustTotal
+    ? 'all must-dos complete. the village is proud.'
+    : `${mustTotal - mustDone} must-do${mustTotal - mustDone > 1 ? 's' : ''} missed. tomorrow starts fresh.`;
+  $('modal-curtain').classList.add('open');
+};
+
+// ── Glossary ──
+window.openGlossary = function(profile) {
+  const sheet = $('modal-glossary-sheet');
+  const content = $('glossary-content');
+  const title = $('glossary-title');
+  const sub = $('glossary-sub');
+  if (profile === 'narain') {
+    sheet.className = 'modal-sheet narain-modal';
+    title.innerHTML = 'the <em>field guide</em>';
+    sub.textContent = '~ a ninja knows their symbols ~';
+    content.innerHTML = `
+      <div class="glossary-item"><div class="glossary-icon">⚡</div><div class="glossary-text"><div class="glossary-term" style="color:var(--narain-text);">Chakra Points</div><div class="glossary-def" style="color:var(--narain-dim);">Earned for completed training. Trade for rewards. Never expire.</div></div></div>
+      <div class="glossary-item"><div class="glossary-icon">♡</div><div class="glossary-text"><div class="glossary-term" style="color:var(--narain-text);">Lives</div><div class="glossary-def" style="color:var(--narain-dim);">Three per month. One lost when a required jutsu is missed. Resets on the 1st.</div></div></div>
+      <div class="glossary-item"><div class="glossary-icon">🛡️</div><div class="glossary-text"><div class="glossary-term" style="color:var(--narain-text);">Scroll Seals</div><div class="glossary-def" style="color:var(--narain-dim);">Three per month. Auto-activate when a required jutsu is missed — your streak survives.</div></div></div>
+      <div class="glossary-item"><div class="glossary-icon">◆</div><div class="glossary-text"><div class="glossary-term" style="color:var(--narain-text);">Required Jutsu</div><div class="glossary-def" style="color:var(--narain-dim);">Non-negotiable missions. Miss one, lose a life (or burn a seal).</div></div></div>
+      <div class="glossary-item"><div class="glossary-icon">📜</div><div class="glossary-text"><div class="glossary-term" style="color:var(--narain-text);">Shadow Chronicles</div><div class="glossary-def" style="color:var(--narain-dim);">Your training log. The most honest record of your journey.</div></div></div>
+      <div class="glossary-item"><div class="glossary-icon">⚡</div><div class="glossary-text"><div class="glossary-term" style="color:var(--narain-text);">Ranks</div><div class="glossary-def" style="color:var(--narain-dim);">Twelve ninja ranks from Academy Student to Hokage. Each one earned.</div></div></div>`;
+  } else {
+    sheet.className = 'modal-sheet aditi-modal';
+    title.innerHTML = 'the <em>glossary</em>';
+    sub.textContent = '~ a small key to all the symbols ~';
+    content.innerHTML = `
+      <div class="glossary-item"><div class="glossary-icon">✦</div><div class="glossary-text"><div class="glossary-term">Stars</div><div class="glossary-def">Earned for completed tasks. Trade for rewards. They never expire.</div></div></div>
+      <div class="glossary-item"><div class="glossary-icon">♡</div><div class="glossary-text"><div class="glossary-term">Lives</div><div class="glossary-def">Three per month. One lost when a must-do is missed. Resets the 1st.</div></div></div>
+      <div class="glossary-item"><div class="glossary-icon">🛡️</div><div class="glossary-text"><div class="glossary-term">Streak Freezes</div><div class="glossary-def">Three per month. Used automatically when you miss a must-do — your streak survives, your life still goes.</div></div></div>
+      <div class="glossary-item"><div class="glossary-icon">◆</div><div class="glossary-text"><div class="glossary-term">Must-Do</div><div class="glossary-def">The non-negotiables. Miss one, lose a life (or burn a freeze).</div></div></div>
+      <div class="glossary-item"><div class="glossary-icon">5</div><div class="glossary-text"><div class="glossary-term">Track 5</div><div class="glossary-def">The journal. The most honest page of every era.</div></div></div>
+      <div class="glossary-item"><div class="glossary-icon">◈</div><div class="glossary-text"><div class="glossary-term">Eras</div><div class="glossary-def">Your levels. Each one earned, each one yours.</div></div></div>`;
+  }
+  $('modal-glossary').classList.add('open');
+};
+
+// ── Modal close ──
+window.closeModal = function(id) {
+  $(id).classList.remove('open');
+};
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+});
+
+// ── Splash → Home ──
+setTimeout(() => {
+  $('splash-status').textContent = 'welcome to your era';
+  setTimeout(() => showScreen('screen-home'), 800);
+}, 1200);
+</script>
+</body>
+</html>
