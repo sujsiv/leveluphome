@@ -1884,7 +1884,6 @@ window.pinDelete = function() {
 
 function updatePinDots() {
   for (let i = 0; i < 4; i++) {
-    $(` pd${i}`);
     document.getElementById('pd'+i).classList.toggle('filled', i < pinBuffer.length);
   }
 }
